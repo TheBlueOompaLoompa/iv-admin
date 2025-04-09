@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IV</title>
+</head>
+<body>
+    <input type="number" id="ml"><span>mL</span>
+    <input type="number" id="min"><span>minutes</span>
+    <button onclick="start">Start</button>
+    <button onclick="stop">Stop</button>
+
+    <h1 id="status">Status: Unknown</h1>
+
+    <script>
+        const mlEl = document.querySelector('#ml');
+        const minEl = document.querySelector("#min");
+        const statusEl = document.querySelector('#status');
+        async function start() {
+            fetch(`http://192.168.42.1/run?volume=${mlEl.value}&minutes=${minEl.value}`);
+        }
+
+        function stop() {
+            fetch(`http://192.168.42.1/stop`)
+        }
+
+        setInterval(async () => {
+            const res = await fetch('http://192.168.42.1/status');
+            const text = await res.text();
+            console.log(text);
+            const ab = text.split(',');
+            const totalTime = parseInt(ab[1]);
+            const mins = Math.floor(totalTime/60);
+            const hours = Math.floor(totalTime/60/60);
+            const seconds = totalTime % 60;
+            statusEl.innerHTML = `${ab[0]} mL <br> ${hours}:${mins}:${seconds}`
+        }, 1000)
+    </script>
+</body>
+</html>
