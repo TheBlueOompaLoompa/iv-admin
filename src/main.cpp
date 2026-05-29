@@ -6,17 +6,7 @@
 #include <Adafruit_SSD1306.h>
 
 #include <DNSServer.h>
-#ifdef ESP32
-  #include <AsyncTCP.h>
-  #include <WiFi.h>
-#elif defined(ESP8266)
-  #include <ESP8266WiFi.h>
-  #include <ESPAsyncTCP.h>
-#elif defined(TARGET_RP2040)
-  #include <WebServer.h>
-  #include <WiFi.h>
-#endif
-
+#include <WiFi.h>
 #include "ESPAsyncWebServer.h"
 
 //#include <LittleFS.h>
@@ -191,7 +181,7 @@ void notFound(AsyncWebServerRequest* request) {
 }
 
 DNSServer dnsServer;
-AsyncWebServer server(80);
+static AsyncWebServer server(80);
 
 float volume = 0; // mL
 long minutes = 0;
@@ -201,6 +191,7 @@ bool stopweb = false;
 long remaining = 0;
 
 void setup() {
+    Serial.begin();
     /*if(!LittleFS.begin(true)){
         Serial.println("An Error has occurred while mounting LittleFS");
         return;
@@ -213,8 +204,7 @@ void setup() {
         return;
     }*/
 
-
-    if (!WiFi.softAP("IV", "verysecurepasswordIV")) {
+    if (!WiFi.beginAP("IV", "verysecurepasswordIV")) {
         Serial.println("Soft AP creation failed.");
         while (1);
     }
